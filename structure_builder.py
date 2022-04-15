@@ -10,7 +10,7 @@ class HtmlBuilder:  # Only for python > 3.6
         Div = CreateHtmlElement('div')
         header = HtmlBuilder(H1(text='Hello, world!')).append(Div(class_='hello')) -> HtmlBuilder
 
-        header.to_html() -> html`s str
+        header.to_html() -> html`s code
     """
 
     __slots__ = ['base', '_structure']
@@ -25,6 +25,10 @@ class HtmlBuilder:  # Only for python > 3.6
     def __repr__(self):
         return str(self._structure)
 
+    @staticmethod
+    def __is_element_or_builder(other):
+        assert isinstance(other, HtmlElement) or isinstance(other, HtmlBuilder), 'Use only HtmlElement or HtmlElement'
+
     def __before_after_mixin(self, key, other_element, structure):
         if key == self.base:
             if isinstance(other_element, HtmlBuilder):
@@ -35,6 +39,7 @@ class HtmlBuilder:  # Only for python > 3.6
         return structure
 
     def before(self, other_element):
+        self.__is_element_or_builder(other_element)
         structure = {}
         for key, value in self._structure.items():
             structure = self.__before_after_mixin(key, other_element, structure)
@@ -43,6 +48,7 @@ class HtmlBuilder:  # Only for python > 3.6
         return self
 
     def after(self, other_element):
+        self.__is_element_or_builder(other_element)
         structure = {}
         for key, value in self._structure.items():
             structure[key] = value
@@ -51,6 +57,7 @@ class HtmlBuilder:  # Only for python > 3.6
         return self
 
     def prepend(self, other_element):
+        self.__is_element_or_builder(other_element)
         structure = {}
         for key, value in self._structure.items():
             if key == self.base:
@@ -64,6 +71,7 @@ class HtmlBuilder:  # Only for python > 3.6
         return self
 
     def append(self, other_element):
+        self.__is_element_or_builder(other_element)
         structure = {}
         for key, value in self._structure.items():
             if key == self.base:
